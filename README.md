@@ -15,17 +15,9 @@ In the main folder you'll find a bash script to create or shutdown the container
 
 The script also is checking with a curl command if the containers are working or not.
 
-```mermaid
-graph LR
-A[Browser] -- GET/POST --> B[NGINX]
-B --> C{AUTH} -- YES --> D[Results]
-D --> A
-C --> E[Auth Denied]
-```
-
 **In order to run it, You need to have installed on your PC/MacOsX/Linux, Docker and docker-compose.**
 
-## Files
+## Files inside the local folder
 |       FILE/FOLDER     |ASCII                          |ARGUMENTS                         |
 |----------------|-------------------------------|-----------------------------|
 |deploy_me.sh |`'To exec from your terminal with arguments'`            |'**start** = build&start containers'; '**stop** = stop containers;' '**remove** = stop&remove containers'            |
@@ -33,9 +25,14 @@ C --> E[Auth Denied]
 |/garanet/|`Include Dockerfile, Flask Application`|-|
 |/nginx/   |`Include Dockerfile, Nginx conf, htpasswd`|-|
 
+## Files inside the local folder
+Inside the ci-cd folder you'll find an syntax exanple for the gitlab-ci pipeline.
+
 ## Run it
 You have to run it form your terminal, make sure the script has the exec privileges, otherwise run
 
+    ~:# cd local/
+    
     ~:# chmod a+x deploy_me.sh
 
     ~:# ./deploy_me.sh start
