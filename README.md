@@ -7,8 +7,13 @@ repo from: https://github.com/garanet/Docker-Python-Flask-with-NGINX-for-AUTH
 Tested on a MacOsx with Docker + Kuberneters (Docker-Desktop)
 ```
 
-This project shows how you can create a python flask api with docker behind a reverse proxy to protect different /endpoints. It could be easily integrated with different pipeline to trigger when a dockerfile or your app.py changes.
-In the main folder you'll find a bash script to create or shutdown the containers. The script also is checking with a curl command if the containers are working or not.
+This project shows how you can create a python flask api with docker behind a reverse proxy to protect different /endpoints. 
+
+It could be easily integrated with different pipeline to trigger when a dockerfile or your app.py changes.
+
+In the main folder you'll find a bash script to create or shutdown the containers.
+
+The script also is checking with a curl command if the containers are working or not.
 
 ```mermaid
 graph LR
@@ -33,7 +38,8 @@ You have to run it form your terminal, make sure the script has the exec privile
 
     ~:# chmod a+x deploy_me.sh
 
-    ~:#./deploy_me.sh start
+    ~:# ./deploy_me.sh start
+    
 Running tha above command, the Docker will create 2 docker containers locally to expose 3 endpoints API with FLASK.
 
  - The first container is the python FLASK app. 
@@ -42,14 +48,21 @@ Running tha above command, the Docker will create 2 docker containers locally to
 ## How check it
 
 From your browser you can retreive the urls:
+
 **GET:**
+
 http://localhost:8080/garanet
+
 http://localhost:8080/world
+
 **POST:**
+
 From your terminal you can POST a JSON via curl like:
 
     ~:# curl --user guest --header "Content-Type: application/json" --request POST --data '{"key":"POST JSON WORKS"}' http://localhost:5000/getmyfile
+
 The default username and password are ***guest / guest.***
+
 You can change it generating a htapasswd file from the command line like:
 
     ~:# htpasswd -c PATH/.htapasswd username
