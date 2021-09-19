@@ -1,0 +1,60 @@
+# A Docker Python-Flask with NGINX for the AUTH project
+# @maintainer G.Gatto 2021 - www.garanet.net
+# repo from: https://github.com/garanet/Docker-Python-Flask-with-NGINX-for-AUTH
+# Tested on a MacOsx with Docker + Kuberneters (Docker-Desktop)
+image:
+  name: docker/compose:1.24.1
+  entrypoint: ["/bin/sh", "-c"]
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - tests
+  - deploy
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - export IMAGE=$CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME
+  - apk add --no-cache openssh-client bash curl
+  - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+  - chmod a+x ./setup_env.sh
+  - bash ./setup_env.sh
+
+build:
+  stage: build
+  script:
+    - export PLOTWISE_IMAGE=$IMAGE:garanet
+    - export NGINX_IMAGE=$IMAGE:nginx
+    - docker pull $IMAGE:garanet || true
+    - docker-compose -f docker-compose-ci.yml build --no-cache
+    - docker push $IMAGE:garanet
+    - docker push $IMAGE:nginx
+
+tests:
+  stage: tests
+  script:
+    - curl -so /dev/null http://localhost:5000/garanet
+    - curl -so /dev/null http://localhost:5000/world
+    
+deploy:
+  stage: deploy
+  script:
+    - export PLOTWISE_IMAGE=$IMAGE:garanet
+    - export NGINX_IMAGE=$IMAGE:nginx
+    - mkdir -p ~/.ssh
+    - echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - cat ~/.ssh/id_rsa
+    - chmod 700 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan -H 'gitlab.com' >> ~/.ssh/known_hosts
+    - chmod +x ./deploy.sh
+    - scp  -o StrictHostKeyChecking=no -r ./.env ./nginx/dev.conf ./docker-compose-prod.yml root@$DO_IP_ADDRESS:/app
+    - bash ./deploy.sh
+  only:
+    - master

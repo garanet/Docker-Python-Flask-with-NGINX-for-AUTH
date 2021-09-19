@@ -1,0 +1,25 @@
+# A Docker Python-Flask with NGINX for the AUTH project
+# @maintainer G.Gatto 2021 - www.garanet.net
+# repo from: https://github.com/garanet/Docker-Python-Flask-with-NGINX-for-AUTH
+# Tested on a MacOsx with Docker + Kuberneters (Docker-Desktop)
+version: '3.7'
+
+services:
+  garanet:
+    image: "${PLOTWISE_IMAGE}"
+    container_name: garanet
+    restart: unless-stopped
+    ports:
+      - 5000
+    environment:
+      - FLASK_ENV=production
+      - APP_SETTINGS=project.config.ProductionConfig
+      - SECRET_KEY=${SECRET_KEY}
+
+  nginx:
+    image: "${NGINX_IMAGE}"
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on:
+      - garanet
